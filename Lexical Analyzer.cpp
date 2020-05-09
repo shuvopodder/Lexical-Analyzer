@@ -11,16 +11,15 @@ bool RealNumber(char* str)
 	int i, len = strlen(str);
 	int s = atoi(str);
 	bool hasDecimal = false;
+	
 
 	if (len == 0)
 		return (false);
 	for (i = 0; i < len; i++) {
-		/*(str[i] != '0' && str[i] != '1' && str[i] != '2'
-		&& str[i] != '3' && str[i] != '4' && str[i] != '5'
-			&& str[i] != '6' && str[i] != '7' && str[i] != '8'
-			&& str[i] != '9' && str[i] != '.' ||
-			(str[i] == '-' && i > 0))*/
-	
+		if ((str[i] == '.') && ((str[i+1] >= 'A' && str[i+1] <= 'Z') || (str[i+1] >= 'a' && str[i+1] <= 'z')))
+		{
+			cout << "Error at ." << "  ";
+		}
 		if (!(s>=0 && s <=9 )&& str[i] != '.' ||
 			(str[i] == '-' && i > 0))
 			return (false);
@@ -48,7 +47,7 @@ bool keyword(char* str)
 {
 	if (!strcmp(str, "if") || !strcmp(str, "else") ||
 		!strcmp(str, "while") || !strcmp(str, "do") ||
-		!strcmp(str, "break") ||
+		!strcmp(str, "break") || !strcmp(str, "for") || !strcmp(str, "return")||
 		!strcmp(str, "continue") || !strcmp(str, "int")
 		|| !strcmp(str, "double") || !strcmp(str, "float")
 		|| !strcmp(str, "return") || !strcmp(str, "char")
@@ -69,7 +68,7 @@ bool Boolean(char* str)
 }
 bool CompOperator(char* str)
 {
-	if (!strcmp(str, "==") || !strcmp(str, ">") )
+	if (!strcmp(str, "==") || !strcmp(str, ">") || !strcmp(str, "<") || !strcmp(str, "<=") || !strcmp(str, ">="))
 		return (true);
 	return (false);
 }
@@ -112,12 +111,12 @@ void func(const char* str, int n)
 	
 		if (str[y] == '"') {
 			y += 1;
-			cout << "String: ";
+			cout << "<CHAR, ";
 			while (str[y] != '"') {
 				cout << str[y];
 				y++;
 			}
-			cout << endl;
+			cout <<">"<< endl;
 			y++;
 			x = y;
 			
@@ -135,14 +134,23 @@ void func(const char* str, int n)
 					cout << "<ASIGN>" << endl;
 				}
 				else {
-					cout << "Arithmetic operator " << str[y] << endl;
+					cout << "<ARITHMETIC, " << str[y] <<">"<< endl;
 
 				}
 				
 			}
 			if (paren(str[y]) == true )
 			{
-				cout << "<LPAREN," << str[y] << ">"<<endl;
+				if (str[y] == '(') {
+					cout << "<LPAREN," << str[y] << ">"<<endl;
+				}
+				else if(str[y] == ')'){
+					cout << "<RPAREN," << str[y] << ">" << endl;
+				}
+				else {
+					cout << "<PAREN," << str[y] << ">" << endl;
+				}
+				
 			}
 			if (str[y] == ',')
 			{
@@ -150,7 +158,14 @@ void func(const char* str, int n)
 			}
 			if (Operator(str[y]) == true && Operator(str[y + 1]) == true)
 			{
-				cout << "<COMP," << str[y] <<str[y+1]<< ">"<<endl;
+				if ((str[y] == str[y + 1])&&str[y]!='=') {
+					cout << "<BITWISE," << str[y] << str[y + 1] << ">" << endl;
+				}
+				else {
+					cout << "<COMPARE," << str[y] <<str[y+1]<< ">"<<endl;
+
+				}
+				
 				y++;
 			}
 			y++;
@@ -174,30 +189,34 @@ void func(const char* str, int n)
 
 			else if (CompOperator(subStr) == true)
 			{
-				cout << "Comparision operator " << subStr << endl;
+				cout << "<COMPARE," << subStr << ">"<<endl;
 			}
 
 
 			else if (Integer(subStr) == true)
 				printf("<INT ,%s>\n", subStr);
 
-			else if (RealNumber(subStr) == true) {
-				/*if (Identifier(subStr[1])==true) {
-
-				}*/
+			else if (RealNumber(subStr) == true) 
 				cout << "<FLOAT," << subStr << ">" << endl;
-				//printf("'%s' IS A REAL NUMBER\n", subStr);
-			}
+			
 			else if (Boolean(subStr))
 				cout << "<BOOL>" << endl;
 				
 
-			else if (Identifier(subStr) == true && delimiter(str[y - 1]) == false)
+			else if (Identifier(subStr) == true && delimiter(str[y - 1]) == false )
 				printf("<ID,%s>\n", subStr);
 
 			else if (Identifier(subStr) == false
-				&& delimiter(str[y - 1]) == false)
-				printf("'%s' IS NOT A VALID IDENTIFIER\n", subStr);
+				&& delimiter(str[y - 1]) == false) {
+				//printf("'%s' IS NOT A VALID IDENTIFIER\n", subStr);
+				cout << "<INTEGER," << subStr[0] << ">\n"<<"<ID,";
+				for (int a = 1; a < strlen(subStr); a++) {
+					cout << subStr[a];
+				}
+				cout << ">"<<endl;
+
+			}
+				
 			x = y;
 		}
 		i++;
