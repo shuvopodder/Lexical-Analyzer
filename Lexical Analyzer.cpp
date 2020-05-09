@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdlib>
 #include <stdlib.h>
 
 using namespace std;
@@ -8,15 +9,19 @@ using namespace std;
 bool RealNumber(char* str)
 {
 	int i, len = strlen(str);
+	int s = atoi(str);
 	bool hasDecimal = false;
 
 	if (len == 0)
 		return (false);
 	for (i = 0; i < len; i++) {
-		if (str[i] != '0' && str[i] != '1' && str[i] != '2'
-			&& str[i] != '3' && str[i] != '4' && str[i] != '5'
+		/*(str[i] != '0' && str[i] != '1' && str[i] != '2'
+		&& str[i] != '3' && str[i] != '4' && str[i] != '5'
 			&& str[i] != '6' && str[i] != '7' && str[i] != '8'
 			&& str[i] != '9' && str[i] != '.' ||
+			(str[i] == '-' && i > 0))*/
+	
+		if (!(s>=0 && s <=9 )&& str[i] != '.' ||
 			(str[i] == '-' && i > 0))
 			return (false);
 		if (str[i] == '.')
@@ -28,14 +33,13 @@ bool RealNumber(char* str)
 bool Integer(char* str)
 {
 	int i, len = strlen(str);
-
+	int s = atoi(str);
 	if (len == 0)
 		return (false);
 	for (i = 0; i < len; i++) {
-		if (str[i] != '0' && str[i] != '1' && str[i] != '2'
-			&& str[i] != '3' && str[i] != '4' && str[i] != '5'
-			&& str[i] != '6' && str[i] != '7' && str[i] != '8'
-			&& str[i] != '9' || (str[i] == '-' && i > 0))
+
+		
+		if (str[i] != '0' && str[i] != '1' && str[i] != '2'&& str[i] != '3' && str[i] != '4' && str[i] != '5'&& str[i] != '6' && str[i] != '7' && str[i] != '8'&& str[i] != '9' || (str[i] == '-' && i > 0))
 			return (false);
 	}
 	return (true);
@@ -57,6 +61,18 @@ bool keyword(char* str)
 		return (true);
 	return (false);
 }
+bool Boolean(char* str)
+{
+	if (!strcmp(str, "true") || !strcmp(str, "false"))
+		return true;
+	return false;
+}
+bool CompOperator(char* str)
+{
+	if (!strcmp(str, "==") || !strcmp(str, ">") )
+		return (true);
+	return (false);
+}
 bool Operator(char ch)
 {
 	if (ch == '+' || ch == '-' || ch == '*' ||
@@ -67,9 +83,15 @@ bool Operator(char ch)
 }
 bool delimiter(char ch)
 {
-	if (ch == ' ' || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == ',' || ch == ';' || ch == '>' || ch == '<' || ch == '=' || ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == '{' || ch == '}')
+	if (ch == ' ' || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == ',' || ch == ';' || ch == '>' ||
+		ch == '<' || ch == '=' || ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == '{' || ch == '}')
 		return (true);
 	return (false);
+}
+bool paren(char ch) {
+	if (ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == '{' || ch == '}')
+		return (true);
+	return false;
 }
 bool Identifier(char* str)
 {
@@ -82,18 +104,54 @@ bool Identifier(char* str)
 }
 void func(const char* str, int n)
 {
-	int i = 0, x = 0, y = 0;
-	while (y <= n && x<=y)
+	int i = 0, x = 0, y = 0; 
+	int lp = 0, rp = 0;
+	int t = 0;
+	while (y <= n && x <= y)
 	{
+	
+		if (str[y] == '"') {
+			y += 1;
+			cout << "String: ";
+			while (str[y] != '"') {
+				cout << str[y];
+				y++;
+			}
+			cout << endl;
+			y++;
+			x = y;
+			
+		}
+
 		if (delimiter(str[y]) == false)
 		{
 			y++;
 		}
 		if (delimiter(str[y]) == true && x == y)
 		{
-			if (Operator(str[y])==true)
+			if (Operator(str[y])==true && Operator(str[y+1]) == false)
 			{
-				cout << "Arithmetic operator " << str[y] << endl;
+				if (str[y] == '=') {
+					cout << "<ASIGN>" << endl;
+				}
+				else {
+					cout << "Arithmetic operator " << str[y] << endl;
+
+				}
+				
+			}
+			if (paren(str[y]) == true )
+			{
+				cout << "<LPAREN," << str[y] << ">"<<endl;
+			}
+			if (str[y] == ',')
+			{
+				cout << "<COMMA>" << endl;
+			}
+			if (Operator(str[y]) == true && Operator(str[y + 1]) == true)
+			{
+				cout << "<COMP," << str[y] <<str[y+1]<< ">"<<endl;
+				y++;
 			}
 			y++;
 			x = y;
@@ -111,19 +169,31 @@ void func(const char* str, int n)
 			if (keyword(subStr) == true) {
 				for (int i = 0; i < strlen(subStr); i++)
 					putchar(toupper(subStr[i]));
-				printf("'%s'\n", subStr);
+				printf("\n");
 			}
-				
+
+			else if (CompOperator(subStr) == true)
+			{
+				cout << "Comparision operator " << subStr << endl;
+			}
+
 
 			else if (Integer(subStr) == true)
-				printf("INT :%s\n", subStr);
+				printf("<INT ,%s>\n", subStr);
 
-			else if (RealNumber(subStr) == true)
-				printf("'%s' IS A REAL NUMBER\n", subStr);
+			else if (RealNumber(subStr) == true) {
+				/*if (Identifier(subStr[1])==true) {
 
-			else if (Identifier(subStr) == true
-				&& delimiter(str[y - 1]) == false)
-				printf("'%s' IS A VALID IDENTIFIER\n", subStr);
+				}*/
+				cout << "<FLOAT," << subStr << ">" << endl;
+				//printf("'%s' IS A REAL NUMBER\n", subStr);
+			}
+			else if (Boolean(subStr))
+				cout << "<BOOL>" << endl;
+				
+
+			else if (Identifier(subStr) == true && delimiter(str[y - 1]) == false)
+				printf("<ID,%s>\n", subStr);
 
 			else if (Identifier(subStr) == false
 				&& delimiter(str[y - 1]) == false)
